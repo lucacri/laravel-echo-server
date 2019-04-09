@@ -1,7 +1,7 @@
 FROM lucacri/alpine-base:latest
 LABEL maintainer="lucacri@gmail.com"
 
-ARG CACHEBUST=20190313
+ARG CACHEBUST=20190409
 
 ARG UID=501
 ARG GID=501
