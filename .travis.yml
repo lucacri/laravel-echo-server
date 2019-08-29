@@ -1,0 +1,30 @@
+language: bash
+services: docker
+env:
+  global:
+    - IMAGE_NAME=lucacri/laravel-echo-server
+
+# Only build tags
+if: tag IS present
+
+before_script:
+  - docker pull "$IMAGE_NAME" || true
+script:
+  - curl -o /tmp/semver https://raw.githubusercontent.com/fsaintjacques/semver-tool/2.1.0/src/semver && chmod +x /tmp/semver
+  - sudo cp /tmp/semver /usr/local/bin
+  - make build TAG=${TRAVIS_TAG}
+
+after_script:
+  - docker images
+
+before_deploy:
+  - echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USERNAME" --password-stdin
+  - make tag TAG=${TRAVIS_TAG}
+  - docker images
+  
+deploy:
+  provider: script
+  # script: docker push "${IMAGE_NAME}:latest" && docker push "${IMAGE_NAME}:${version}"
+  script: make push TAG=${TRAVIS_TAG}
+  on:
+    tags: true
